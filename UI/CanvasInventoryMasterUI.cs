@@ -207,7 +207,7 @@ namespace InventoryMaster.UI
             for (int i = 0; i < tabNames.Length; i++)
             {
                 int index = i;
-                var tabBtn = CreateButton(tabRow.transform, $"TabBtn_{i}", tabNames[i], Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, () => SelectTab(index), TabInactiveBg, TabInactiveText, 13);
+                var tabBtn = CreateButton(tabRow.transform, $"TabBtn_{i}", tabNames[i], Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, () => SelectTab(index), TabInactiveBg, TabInactiveText, 15);
                 _tabButtonImages[i] = tabBtn.GetComponent<Image>();
                 _tabButtonTexts[i] = tabBtn.GetComponentInChildren<Text>();
             }
@@ -230,9 +230,9 @@ namespace InventoryMaster.UI
             SelectTab(0);
 
             // Fixed Hotkeys Footer Bar (Showing F2 for Menu - Zero conflict with Sailor's Companion)
-            var footerBar = CreateBox(_modWindowGO.transform, "FooterBar", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 36), WoodTitleBar);
+            var footerBar = CreateBox(_modWindowGO.transform, "FooterBar", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 42), WoodTitleBar);
             CreateBox(footerBar.transform, "FooterAccent", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 2), WoodTrimAccent);
-            CreateText(footerBar.transform, "FooterText", "<color=#C7A670>Hotkeys:</color> <color=#F5C761>[F2]</color> Menu  |  <color=#F5C761>[Z]</color> Auto Sort  |  <color=#F5C761>[X]</color> Dump to Chest  |  <color=#F5C761>[V]</color> Hotbar Swap  |  <color=#F5C761>[Alt+Click]</color> Lock Slot  |  <color=#F5C761>[Delete]</color> Trash  |  <color=#F5C761>[ESC]</color> Close", 12, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleCenter);
+            CreateText(footerBar.transform, "FooterText", "<color=#C7A670>Hotkeys:</color> <color=#F5C761>[F2]</color> Menu  |  <color=#F5C761>[Z]</color> Auto Sort  |  <color=#F5C761>[X]</color> Dump to Chest  |  <color=#F5C761>[V]</color> Hotbar Swap  |  <color=#F5C761>[Alt+Click]</color> Lock Slot  |  <color=#F5C761>[Delete]</color> Trash  |  <color=#F5C761>[ESC]</color> Close", 14, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleCenter);
         }
 
         private void SelectTab(int index)
@@ -371,15 +371,15 @@ namespace InventoryMaster.UI
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = true;
 
-            var btn1 = CreateButton(row.transform, "Btn1", label1, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, action1, WoodButtonNormal, TextParchmentLight, 13);
-            var btn2 = CreateButton(row.transform, "Btn2", label2, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, action2, WoodButtonNormal, TextParchmentLight, 13);
+            var btn1 = CreateButton(row.transform, "Btn1", label1, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, action1, WoodButtonNormal, TextParchmentLight, 15);
+            var btn2 = CreateButton(row.transform, "Btn2", label2, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, action2, WoodButtonNormal, TextParchmentLight, 15);
         }
 
         private void CreateToggleItem(Transform parent, string label, bool initialValue, Action<bool> onToggle)
         {
             Color plankColor = (_toggleCounter++ % 2 == 0) ? WoodPlankEven : WoodPlankOdd;
-            var row = CreateBox(parent, "ToggleRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 34), plankColor);
-            EnsureLayout(row, -1, 34);
+            var row = CreateBox(parent, "ToggleRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 38), plankColor);
+            EnsureLayout(row, -1, 38);
 
             CreateBox(row.transform, "Seam", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 1), WoodRowBorder);
 
@@ -389,8 +389,8 @@ namespace InventoryMaster.UI
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
-            var labelTxt = CreateText(row.transform, "Label", label, 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            EnsureLayout(labelTxt.gameObject, 860, 30, true);
+            var labelTxt = CreateText(row.transform, "Label", label, 15, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+            EnsureLayout(labelTxt.gameObject, 860, 32, true);
 
             var checkContainer = CreateBox(row.transform, "CheckContainer", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(28, 28), CheckboxWoodBg);
             EnsureLayout(checkContainer, 28, 28, false);
@@ -418,8 +418,8 @@ namespace InventoryMaster.UI
         private void CreateStepperItem(Transform parent, string label, float min, float max, float step, float initialValue, string unit, Action<float> onChange)
         {
             Color plankColor = (_toggleCounter++ % 2 == 0) ? WoodPlankEven : WoodPlankOdd;
-            var row = CreateBox(parent, "StepperRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 34), plankColor);
-            EnsureLayout(row, -1, 34);
+            var row = CreateBox(parent, "StepperRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 38), plankColor);
+            EnsureLayout(row, -1, 38);
 
             CreateBox(row.transform, "Seam", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 1), WoodRowBorder);
 
@@ -432,8 +432,8 @@ namespace InventoryMaster.UI
             float val = initialValue;
             string displayVal = unit == "%" ? $"{Mathf.RoundToInt(val * 100)}%" : $"{val:F0}{unit}";
 
-            var labelTxt = CreateText(row.transform, "Label", $"{label}: <color=#F5C761><b>{displayVal}</b></color>", 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            EnsureLayout(labelTxt.gameObject, 800, 30, true);
+            var labelTxt = CreateText(row.transform, "Label", $"{label}: <color=#F5C761><b>{displayVal}</b></color>", 15, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+            EnsureLayout(labelTxt.gameObject, 800, 32, true);
 
             var minusBtn = CreateButton(row.transform, "Minus", "  －  ", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(44, 28), () =>
             {
