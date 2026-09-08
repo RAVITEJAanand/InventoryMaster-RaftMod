@@ -123,6 +123,14 @@ namespace InventoryMaster.UI
                 Helper.SetCursorVisibleAndLockState(true, CursorLockMode.None);
                 Instance.SelectTab(Instance._activeTab);
             }
+            else
+            {
+                try
+                {
+                    Helper.SetCursorVisibleAndLockState(false, CursorLockMode.Locked);
+                }
+                catch { }
+            }
         }
 
         private void Update()
@@ -134,7 +142,7 @@ namespace InventoryMaster.UI
 
             if (IsWindowOpen && InputHelper.WasKeyPressed(KeyCode.Escape))
             {
-                _modWindowGO.SetActive(false);
+                ToggleWindow();
             }
         }
 
