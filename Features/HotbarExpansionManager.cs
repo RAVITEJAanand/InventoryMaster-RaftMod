@@ -41,8 +41,23 @@ namespace InventoryMaster.Features
                 var backItem = backSlot.itemInstance;
 
                 // Swap
-                hotSlot.SetItem(backItem);
-                backSlot.SetItem(hotItem);
+                if (backItem != null)
+                {
+                    hotSlot.SetItem(backItem);
+                }
+                else
+                {
+                    hotSlot.Reset();
+                }
+
+                if (hotItem != null)
+                {
+                    backSlot.SetItem(hotItem);
+                }
+                else
+                {
+                    backSlot.Reset();
+                }
 
                 hotSlot.RefreshComponents();
                 backSlot.RefreshComponents();
