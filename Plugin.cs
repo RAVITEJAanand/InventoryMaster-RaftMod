@@ -62,6 +62,11 @@ namespace InventoryMaster
 
             // Bind Hotkeys (F2 for Menu, Z for Sort, X for Dump, V for Hotbar Swap)
             KeyMenu = Config.Bind("General.Hotkeys", "KeyMenu", KeyCode.F2, "Hotkey to toggle the in-game Mod Menu (F2 has 0 conflict with Sailor's Companion).");
+            if (KeyMenu.Value == KeyCode.F4)
+            {
+                KeyMenu.Value = KeyCode.F2;
+                try { Config.Save(); } catch { }
+            }
             KeySort = Config.Bind("General.Hotkeys", "KeySort", KeyCode.Z, "Hotkey to auto sort backpack or chest.");
             KeyStorageDump = Config.Bind("General.Hotkeys", "KeyStorageDump", KeyCode.X, "Hotkey to dump backpack into open chest.");
             KeyHotbarSwap = Config.Bind("General.Hotkeys", "KeyHotbarSwap", KeyCode.V, "Hotkey to swap hotbar with backpack row 1.");

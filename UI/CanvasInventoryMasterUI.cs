@@ -192,7 +192,7 @@ namespace InventoryMaster.UI
             var titleBar = CreateBox(_modWindowGO.transform, "TitleBar", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 52), WoodTitleBar);
             CreateBox(titleBar.transform, "TitleAccent", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 3), WoodTrimAccent);
 
-            var titleText = CreateText(titleBar.transform, "TitleText", $"🎒 <color=#FFD54F><b>INVENTORY MASTER</b></color> <size=14><color=#FFE082>v{PluginInfo.PLUGIN_VERSION}</color></size> — <size=14><color=#F5EADB>Quality-of-Life & Inventory Management</color></size>", 20, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleLeft);
+            var titleText = CreateText(titleBar.transform, "TitleText", $"🎒 <color=#FFD54F><b>INVENTORY MASTER</b></color> <size=14><color=#FFE082>v{PluginInfo.PLUGIN_VERSION}</color></size> — <size=13><color=#F5EADB>Quality-of-Life & Inventory Management [F2]</color></size>", 20, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleLeft);
             titleText.rectTransform.offsetMin = new Vector2(20, 0);
             titleText.rectTransform.offsetMax = new Vector2(-70, 0);
 
