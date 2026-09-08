@@ -33,22 +33,20 @@ namespace InventoryMaster.Features
             }
 
             var playerInv = player.Inventory;
+            bool chestOpen = playerInv.secondInventory != null && playerInv.secondInventory.allSlots != null && playerInv.secondInventory.allSlots.Count > 0;
 
             // Check if a secondary chest inventory is currently open
-            if (playerInv.secondInventory != null && playerInv.secondInventory.allSlots != null && playerInv.secondInventory.allSlots.Count > 0)
+            if (chestOpen)
             {
-                SortInventorySlots(playerInv.secondInventory.allSlots, "Chest");
+                SortInventorySlots(playerInv.secondInventory.allSlots, "Chest", false);
             }
 
-            // Sort player backpack slots
-            var backpackSlots = playerInv.backpackSlots != null && playerInv.backpackSlots.Count > 0
-                ? playerInv.backpackSlots
-                : playerInv.allSlots;
-
-            SortInventorySlots(backpackSlots, "Backpack");
+            // Sort player carried inventory slots (all non-hotbar, non-equipment slots)
+            var carriedSlots = PlayerHelper.GetPlayerInventorySlots(playerInv);
+            SortInventorySlots(carriedSlots, "Backpack", chestOpen);
         }
 
-        public static void SortInventorySlots(List<Slot> slots, string inventoryName)
+        public static void SortInventorySlots(List<Slot> slots, string inventoryName, bool suppressEmptyToast = false)
         {
             if (slots == null || slots.Count == 0) return;
 
@@ -85,7 +83,10 @@ namespace InventoryMaster.Features
 
             if (itemsToSort.Count == 0)
             {
-                ToastManager.Show($"✨ {inventoryName} is already empty or sorted.");
+                if (!suppressEmptyToast)
+                {
+                    ToastManager.Show($"✨ {inventoryName} is already empty or sorted.");
+                }
                 return;
             }
 

@@ -29,13 +29,11 @@ namespace InventoryMaster.Features
                 return;
             }
 
-            var backpackSlots = playerInv.backpackSlots != null && playerInv.backpackSlots.Count > 0
-                ? playerInv.backpackSlots
-                : playerInv.allSlots;
+            var sourceSlots = PlayerHelper.GetPlayerInventorySlots(playerInv);
 
             int totalDumped = 0;
 
-            foreach (var slot in backpackSlots)
+            foreach (var slot in sourceSlots)
             {
                 if (slot == null || slot.IsEmpty || !slot.HasValidItemInstance()) continue;
                 if (FavoriteLockManager.IsLocked(slot)) continue; // Strictly protect locked items!
@@ -62,6 +60,15 @@ namespace InventoryMaster.Features
                 {
                     // Chest is full
                     break;
+                }
+            }
+
+            // Refresh all chest slots to ensure visual synchronization
+            if (chestInv.allSlots != null)
+            {
+                foreach (var cs in chestInv.allSlots)
+                {
+                    if (cs != null) cs.RefreshComponents();
                 }
             }
 

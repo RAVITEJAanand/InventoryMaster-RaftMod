@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using InventoryMaster.Helpers;
 
 namespace InventoryMaster.Features
 {
-    #region [START] MODULE: AUTO EQUIP TOOLS (FEATURE 10 - OPTIMIZED)
+    #region [START] MODULE: AUTO EQUIP TOOLS & AUTO-REPLACE (FEATURE 10 - OPTIMIZED)
     // ============================================================================
-    // [START] MODULE: AUTO EQUIP TOOLS (FEATURE 10 - OPTIMIZED)
-    // Purpose: Throttled raycast detection of resources on aim with cached camera
-    //          and zero garbage allocation.
+    // [START] MODULE: AUTO EQUIP TOOLS & AUTO-REPLACE (FEATURE 10 - OPTIMIZED)
+    // Purpose: Throttled raycast detection of resources on aim with cached camera,
+    //          and instant auto-replacement of tools that shatter from zero durability.
     // ============================================================================
     public static class AutoToolEquipManager
     {
@@ -20,7 +21,7 @@ namespace InventoryMaster.Features
         {
             if (Plugin.EnableAutoToolEquip == null || !Plugin.EnableAutoToolEquip.Value) return;
 
-            if (Time.unscaledTime - _lastRaycastTime < 0.4f) return;
+            if (Time.unscaledTime - _lastRaycastTime < 0.35f) return;
             _lastRaycastTime = Time.unscaledTime;
 
             var player = PlayerHelper.GetLocalPlayer();
@@ -35,44 +36,62 @@ namespace InventoryMaster.Features
             var inv = player.Inventory;
             if (inv == null || inv.hotbar == null) return;
 
-            // Raycast forward from camera, ignoring triggers
+            // Raycast forward from camera, reaching up to 15m (hook distance) and hitting triggers
             Ray ray = new Ray(_cachedCamera.transform.position, _cachedCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, 4.5f, ~0, QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(ray, out RaycastHit hit, 15.0f, ~0, QueryTriggerInteraction.Collide))
             {
-                var hitGO = hit.collider.gameObject;
+                var hitCol = hit.collider;
+                if (hitCol == null) return;
+                var hitGO = hitCol.gameObject;
                 if (hitGO == null) return;
 
                 string goName = hitGO.name;
                 string desiredToolKeyword = null;
 
-                if (goName.IndexOf("tree", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                // 1. Axe Context (Trees, Palms, Wood)
+                if (hitGO.GetComponentInParent<HarvestableTree>() != null ||
+                    goName.IndexOf("tree", StringComparison.OrdinalIgnoreCase) >= 0 ||
                     goName.IndexOf("palm", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    goName.IndexOf("pine", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    goName.IndexOf("birch", StringComparison.OrdinalIgnoreCase) >= 0 ||
                     goName.IndexOf("wood", StringComparison.OrdinalIgnoreCase) >= 0 ||
                     goName.IndexOf("trunk", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     desiredToolKeyword = "axe";
                 }
-                else if (goName.IndexOf("debris", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                // 2. Hook Context (Ocean flotsam, debris, floating crates/barrels, reef nodes)
+                else if (hitGO.GetComponentInParent<PickupItem>() != null ||
+                         goName.IndexOf("flotsam", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("plank", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("debris", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("plastic", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("reef", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("clay", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("sand", StringComparison.OrdinalIgnoreCase) >= 0)
+                         goName.IndexOf("sand", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("scrap", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("ore", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     desiredToolKeyword = "hook";
                 }
-                else if (goName.IndexOf("shark", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                // 3. Spear / Weapon Context (Predators, sharks, boars, bears, hostile entities)
+                else if (hitGO.GetComponentInParent<AI_NetworkBehaviour>() != null ||
+                         goName.IndexOf("shark", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("bear", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("boar", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("bird", StringComparison.OrdinalIgnoreCase) >= 0 ||
                          goName.IndexOf("screecher", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("lurker", StringComparison.OrdinalIgnoreCase) >= 0)
+                         goName.IndexOf("lurker", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("hyena", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         goName.IndexOf("rat", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     desiredToolKeyword = "spear";
                 }
 
                 if (!string.IsNullOrEmpty(desiredToolKeyword) && desiredToolKeyword != _lastEquippedToolType)
                 {
-                    // Check if active slot already holds this tool
+                    // Check if current active slot already holds this tool
                     var curSlot = inv.GetSelectedHotbarSlot();
                     if (curSlot != null && !curSlot.IsEmpty && curSlot.GetItemBase() != null)
                     {
@@ -83,7 +102,7 @@ namespace InventoryMaster.Features
                         }
                     }
 
-                    // Look for desired tool in hotbar slots
+                    // Look for desired tool in hotbar slots (0 to hotslotCount-1)
                     int hotCount = Mathf.Min(inv.hotslotCount, 10);
                     for (int i = 0; i < hotCount; i++)
                     {
@@ -101,9 +120,86 @@ namespace InventoryMaster.Features
                 }
             }
         }
+
+        /// <summary>
+        /// Automatically replaces a broken tool in the hotbar with an identical or compatible
+        /// replacement tool found in the player's carried inventory.
+        /// </summary>
+        public static void TryAutoReplaceBrokenTool(PlayerInventory playerInv, Slot hotSlot, Item_Base brokenItem)
+        {
+            if (Plugin.EnableAutoToolEquip == null || !Plugin.EnableAutoToolEquip.Value) return;
+            if (playerInv == null || hotSlot == null || brokenItem == null) return;
+
+            var carriedSlots = PlayerHelper.GetPlayerInventorySlots(playerInv);
+            Slot replacementSlot = null;
+
+            // 1. Priority: Find identical tool (same UniqueIndex)
+            foreach (var s in carriedSlots)
+            {
+                if (s == null || s.IsEmpty || !s.HasValidItemInstance()) continue;
+                if (FavoriteLockManager.IsLocked(s)) continue; // Never auto-consume locked slots
+
+                if (s.itemInstance.baseItem.UniqueIndex == brokenItem.UniqueIndex)
+                {
+                    replacementSlot = s;
+                    break;
+                }
+            }
+
+            // 2. Secondary fallback: Find same tool category (e.g. any axe, hook, or spear)
+            if (replacementSlot == null)
+            {
+                string brokenName = brokenItem.UniqueName;
+                string keyword = null;
+                if (brokenName.IndexOf("axe", StringComparison.OrdinalIgnoreCase) >= 0) keyword = "axe";
+                else if (brokenName.IndexOf("hook", StringComparison.OrdinalIgnoreCase) >= 0) keyword = "hook";
+                else if (brokenName.IndexOf("spear", StringComparison.OrdinalIgnoreCase) >= 0) keyword = "spear";
+                else if (brokenName.IndexOf("bow", StringComparison.OrdinalIgnoreCase) >= 0) keyword = "bow";
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    foreach (var s in carriedSlots)
+                    {
+                        if (s == null || s.IsEmpty || !s.HasValidItemInstance()) continue;
+                        if (FavoriteLockManager.IsLocked(s)) continue;
+
+                        if (s.itemInstance.baseItem.UniqueName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            replacementSlot = s;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (replacementSlot != null && replacementSlot.itemInstance != null)
+            {
+                var replBase = replacementSlot.GetItemBase();
+                int amount = replacementSlot.itemInstance.Amount;
+                int uses = replacementSlot.itemInstance.Uses;
+
+                hotSlot.SetItem(replBase, amount);
+                if (hotSlot.itemInstance != null && uses > 0)
+                {
+                    hotSlot.itemInstance.Uses = uses;
+                }
+
+                replacementSlot.Reset();
+
+                hotSlot.RefreshComponents();
+                replacementSlot.RefreshComponents();
+
+                if (playerInv.hotbar != null)
+                {
+                    playerInv.hotbar.ReselectCurrentSlot();
+                }
+
+                ToastManager.Show($"🔄 Auto-equipped replacement {replBase.UniqueName}!");
+            }
+        }
     }
     // ============================================================================
-    // [END] MODULE: AUTO EQUIP TOOLS (FEATURE 10 - OPTIMIZED)
+    // [END] MODULE: AUTO EQUIP TOOLS & AUTO-REPLACE (FEATURE 10 - OPTIMIZED)
     // ============================================================================
     #endregion
 }

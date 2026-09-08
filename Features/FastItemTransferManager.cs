@@ -34,8 +34,8 @@ namespace InventoryMaster.Features
             if (baseItem == null) return false;
 
             int totalTransferred = 0;
-            var sourceSlots = sourceInv == playerInv && playerInv.backpackSlots != null 
-                ? playerInv.backpackSlots 
+            var sourceSlots = sourceInv == playerInv 
+                ? PlayerHelper.GetPlayerInventorySlots(playerInv) 
                 : sourceInv.allSlots;
 
             foreach (var s in sourceSlots)
@@ -68,6 +68,13 @@ namespace InventoryMaster.Features
 
             if (totalTransferred > 0)
             {
+                if (targetInv.allSlots != null)
+                {
+                    foreach (var ts in targetInv.allSlots)
+                    {
+                        if (ts != null) ts.RefreshComponents();
+                    }
+                }
                 string targetName = targetInv == playerInv ? "Backpack" : "Chest";
                 ToastManager.Show($"⚡ Transferred {totalTransferred}x {baseItem.UniqueName} to {targetName}");
                 return true; // Consumed

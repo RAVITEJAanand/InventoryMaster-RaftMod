@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace InventoryMaster.Helpers
@@ -121,6 +122,36 @@ namespace InventoryMaster.Helpers
         {
             var p = GetLocalPlayer();
             return p != null ? p.Inventory : null;
+        }
+
+        /// <summary>
+        /// Retrieves all active player carried inventory slots (base carried slots + active backpack slots),
+        /// strictly excluding hotbar slots (to protect active hotbar tools) and equipment slots.
+        /// </summary>
+        public static List<Slot> GetPlayerInventorySlots(PlayerInventory playerInv)
+        {
+            var list = new List<Slot>();
+            if (playerInv == null || playerInv.allSlots == null) return list;
+
+            foreach (var slot in playerInv.allSlots)
+            {
+                if (slot == null) continue;
+                // Exclude hotbar slots (indices 0 to hotslotCount-1) to protect tools
+                if (slot.slotType == SlotType.Hotbar) continue;
+                // Exclude clothing and equipment slots
+                if (slot.slotType == SlotType.Equipment) continue;
+                // For backpack expansion slots, only include if active in UI
+                if (slot.slotType == SlotType.Backpack)
+                {
+                    if (!slot.active || (slot.gameObject != null && !slot.gameObject.activeInHierarchy))
+                    {
+                        continue;
+                    }
+                }
+
+                list.Add(slot);
+            }
+            return list;
         }
     }
     // ============================================================================

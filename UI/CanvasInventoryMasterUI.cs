@@ -127,7 +127,7 @@ namespace InventoryMaster.UI
 
         private void Update()
         {
-            if (Plugin.KeyMenu != null && InputHelper.WasKeyPressed(Plugin.KeyMenu.Value))
+            if ((Plugin.KeyMenu != null && InputHelper.WasKeyPressed(Plugin.KeyMenu.Value)) || InputHelper.WasKeyPressed(KeyCode.F2))
             {
                 ToggleWindow();
             }

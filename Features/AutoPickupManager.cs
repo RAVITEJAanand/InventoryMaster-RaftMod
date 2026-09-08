@@ -16,10 +16,6 @@ namespace InventoryMaster.Features
         private static float _lastPickupTime = 0f;
         private const float PICKUP_INTERVAL = 0.35f; // ~3Hz throttled check for maximum FPS
 
-        // Pre-allocated non-alloc buffer to prevent garbage collection stutter
-        private static readonly Collider[] _hitBuffer = new Collider[48];
-        private static readonly HashSet<int> _processedThisTick = new HashSet<int>();
-
         public static void UpdateAutoPickup()
         {
             if (Plugin.EnableAutoPickup == null || !Plugin.EnableAutoPickup.Value) return;
@@ -33,27 +29,17 @@ namespace InventoryMaster.Features
             float radius = Plugin.AutoPickupRadius != null ? Plugin.AutoPickupRadius.Value : 5.0f;
             Vector3 playerPos = player.transform.position;
 
-            // Use spatial physics query instead of expensive FindObjectsOfType scene traversal
-            int hitCount = Physics.OverlapSphereNonAlloc(playerPos, radius, _hitBuffer);
-            if (hitCount <= 0) return;
+            var pickups = UnityEngine.Object.FindObjectsOfType<PickupItem>();
+            if (pickups == null || pickups.Length == 0) return;
 
-            _processedThisTick.Clear();
-
-            for (int i = 0; i < hitCount; i++)
+            foreach (var p in pickups)
             {
-                var col = _hitBuffer[i];
-                _hitBuffer[i] = null; // Clear reference immediately
+                if (p == null || !p.canBePickedUp || p.gameObject == null || !p.gameObject.activeInHierarchy) continue;
 
-                if (col == null || col.isTrigger) continue;
+                float dist = Vector3.Distance(playerPos, p.transform.position);
+                if (dist > radius) continue;
 
-                var p = col.GetComponentInParent<PickupItem>() ?? col.GetComponent<PickupItem>();
-                if (p == null || !p.canBePickedUp) continue;
-
-                int instanceId = p.GetInstanceID();
-                if (_processedThisTick.Contains(instanceId)) continue;
-                _processedThisTick.Add(instanceId);
-
-                // Space check
+                // Inventory capacity check
                 if (p.itemInstance != null && p.itemInstance.baseItem != null)
                 {
                     var baseItem = p.itemInstance.baseItem;
