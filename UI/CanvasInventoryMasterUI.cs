@@ -1,74 +1,77 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using InventoryMaster.Features;
 using InventoryMaster.Helpers;
+using InventoryMaster.Features;
 
 namespace InventoryMaster.UI
 {
-    #region [START] UI: CANVAS INVENTORY MASTER MOD MENU
+    #region [START] CANVAS INVENTORY MASTER SETTINGS UI (AAA STUDIO OVERHAUL)
     // ============================================================================
-    // [START] UI: CANVAS INVENTORY MASTER MOD MENU
-    // Description: Authentic Raft-styled high-DPI Unity Canvas UI with zero OnGUI
-    //              overhead, matching Raft's native wooden plank aesthetics.
-    //              (100% free of overlaps with Sailor's Companion features & hotkeys)
+    // [START] CANVAS INVENTORY MASTER SETTINGS UI (AAA STUDIO OVERHAUL)
+    // Purpose: High-resolution, razor-sharp in-game settings canvas for Inventory Master.
+    //          Uses 1:1 pixel scaling (localScale = 1.0), crystal-clear 24pt dynamic
+    //          typography, sculpted action tiles with hotkey badges, and high contrast.
     // ============================================================================
     public class CanvasInventoryMasterUI : MonoBehaviour
     {
         public static CanvasInventoryMasterUI Instance { get; private set; }
-        public static bool IsWindowOpen => Instance != null && Instance._modWindowGO != null && Instance._modWindowGO.activeSelf;
 
         private GameObject _canvasGO;
         private Canvas _canvas;
         private CanvasScaler _scaler;
         private GraphicRaycaster _raycaster;
         private GameObject _modWindowGO;
-
-        // Tabs
-        private const int TAB_COUNT = 4;
-        private readonly GameObject[] _tabPages = new GameObject[TAB_COUNT];
-        private readonly Text[] _tabButtonTexts = new Text[TAB_COUNT];
-        private readonly Image[] _tabButtonImages = new Image[TAB_COUNT];
-        private int _activeTab = 0;
-        private int _toggleCounter = 0;
-
         private Font _gameFont;
 
-        #region [START] RAFT NATIVE WOODEN PALETTE
+        public static bool IsWindowOpen => Instance != null && Instance._modWindowGO != null && Instance._modWindowGO.activeSelf;
+
+        #region [START] RAFT NATIVE HIGH-CONTRAST TIMBER PALETTE
         // ============================================================================
-        // [START] RAFT NATIVE WOODEN PALETTE (Matching Raft's In-Game Settings Aesthetics)
+        // [START] RAFT NATIVE HIGH-CONTRAST TIMBER PALETTE
         // ============================================================================
-        private static readonly Color WoodWindowBg     = new Color(0.26f, 0.16f, 0.09f, 0.98f); // Deep Teak Plank #422917
-        private static readonly Color WoodWindowBorder = new Color(0.18f, 0.10f, 0.05f, 1.00f); // Dark Outer Timber #2E1A0D
-        private static readonly Color WoodTitleBar     = new Color(0.22f, 0.13f, 0.07f, 1.00f); // Dark Wood Header #382112
-        private static readonly Color WoodTrimAccent   = new Color(0.78f, 0.65f, 0.44f, 1.00f); // Parchment Golden Wood Trim #C7A670
+        private static readonly Color WoodWindowBg      = new Color(0.22f, 0.14f, 0.08f, 0.99f); // Deep Teak Plank
+        private static readonly Color WoodWindowBorder  = new Color(0.12f, 0.07f, 0.03f, 1.00f); // Dark Timber Outline
+        private static readonly Color WoodTitleBar      = new Color(0.18f, 0.11f, 0.05f, 1.00f); // Header Bar
+        private static readonly Color WoodTrimAccent    = new Color(0.88f, 0.72f, 0.42f, 1.00f); // Golden Wood Trim #E0B86B
 
         // Tab Colors
-        private static readonly Color TabActiveBg      = new Color(0.86f, 0.72f, 0.48f, 1.00f); // Warm Birch Parchment
-        private static readonly Color TabActiveText    = new Color(0.18f, 0.10f, 0.05f, 1.00f); // Deep Carved Wood Font
-        private static readonly Color TabInactiveBg    = new Color(0.20f, 0.12f, 0.06f, 0.96f); // Dark Inactive Wood
-        private static readonly Color TabInactiveText  = new Color(0.82f, 0.72f, 0.58f, 1.00f); // Parchment Beige
+        private static readonly Color TabActiveBg       = new Color(0.88f, 0.74f, 0.48f, 1.00f); // Warm Birch Parchment
+        private static readonly Color TabActiveText     = new Color(0.16f, 0.09f, 0.04f, 1.00f); // Deep Carved Wood Text
+        private static readonly Color TabInactiveBg     = new Color(0.18f, 0.11f, 0.06f, 0.98f); // Dark Teak Tab
+        private static readonly Color TabInactiveText   = new Color(0.85f, 0.75f, 0.60f, 1.00f); // Parchment Beige
 
         // Alternating Plank Strips
-        private static readonly Color WoodPlankEven    = new Color(0.30f, 0.18f, 0.11f, 0.95f); // Plank A
-        private static readonly Color WoodPlankOdd     = new Color(0.34f, 0.21f, 0.12f, 0.95f); // Plank B
-        private static readonly Color WoodRowBorder    = new Color(0.20f, 0.11f, 0.06f, 0.90f); // Plank Gap Seam
+        private static readonly Color WoodPlankEven     = new Color(0.26f, 0.16f, 0.10f, 0.98f); // Plank A
+        private static readonly Color WoodPlankOdd      = new Color(0.30f, 0.18f, 0.11f, 0.98f); // Plank B
+        private static readonly Color WoodRowBorder     = new Color(0.14f, 0.08f, 0.04f, 0.90f); // Plank Seam
 
-        // Text Colors
-        private static readonly Color TextParchmentLight = new Color(0.95f, 0.90f, 0.80f, 1.00f); // Warm Ivory
-        private static readonly Color TextGoldHeading    = new Color(0.96f, 0.78f, 0.38f, 1.00f); // Gold Stencil
-        private static readonly Color TextMuted          = new Color(0.68f, 0.58f, 0.45f, 1.00f); // Muted Wood
+        // High-Contrast Text Colors
+        private static readonly Color TextWhite          = new Color(1.00f, 1.00f, 1.00f, 1.00f); // Pure Crisp White
+        private static readonly Color TextParchmentLight = new Color(0.96f, 0.92f, 0.85f, 1.00f); // Warm Ivory
+        private static readonly Color TextGoldHeading    = new Color(1.00f, 0.82f, 0.35f, 1.00f); // Vibrant Gold
+        private static readonly Color TextMuted          = new Color(0.78f, 0.68f, 0.54f, 1.00f); // Soft Timber
 
-        // Checkboxes & Buttons
-        private static readonly Color CheckboxWoodBg   = new Color(0.18f, 0.10f, 0.05f, 0.98f); // Recessed Box
-        private static readonly Color CheckmarkGold    = new Color(0.92f, 0.78f, 0.52f, 1.00f); // Raft Golden Wood Check
-        private static readonly Color WoodButtonNormal = new Color(0.38f, 0.23f, 0.14f, 0.96f); // Wood Plank Button
-        private static readonly Color WoodButtonHover  = new Color(0.48f, 0.30f, 0.18f, 1.00f); // Lighter Wood Hover
+        // Action Buttons & Checkboxes
+        private static readonly Color ActionTileBg      = new Color(0.34f, 0.21f, 0.12f, 1.00f); // Carved Oak Button
+        private static readonly Color ActionTileHover   = new Color(0.48f, 0.30f, 0.18f, 1.00f); // Bright Polished Hover
+        private static readonly Color ActionTileBorder  = new Color(0.88f, 0.70f, 0.38f, 0.95f); // Golden Brass Rim
+        private static readonly Color CheckboxWoodBg    = new Color(0.14f, 0.08f, 0.04f, 0.98f); // Inset Box
+        private static readonly Color CheckmarkGold     = new Color(1.00f, 0.82f, 0.35f, 1.00f); // Vibrant Gold Check
+        private static readonly Color ButtonWoodNormal  = new Color(0.38f, 0.23f, 0.14f, 0.98f); // Button Normal
+        private static readonly Color ButtonCloseRed    = new Color(0.65f, 0.16f, 0.14f, 0.98f); // Close Red
         // ============================================================================
-        // [END] RAFT NATIVE WOODEN PALETTE
+        // [END] RAFT NATIVE HIGH-CONTRAST TIMBER PALETTE
         // ============================================================================
         #endregion
+
+        // Tabs Management
+        private const int TAB_COUNT = 4;
+        private GameObject[] _tabPages = new GameObject[TAB_COUNT];
+        private Image[] _tabButtonImages = new Image[TAB_COUNT];
+        private Text[] _tabButtonTexts = new Text[TAB_COUNT];
+        private int _activeTab = 0;
+        private int _toggleCounter = 0;
 
         private void Awake()
         {
@@ -83,6 +86,15 @@ namespace InventoryMaster.UI
         {
             if (_gameFont != null) return _gameFont;
 
+            // Prioritize high-resolution 24pt Segoe UI / Arial for crisp PC text
+            try
+            {
+                _gameFont = Font.CreateDynamicFontFromOSFont(new[] { "Segoe UI Semibold", "Segoe UI", "Arial", "Tahoma" }, 24);
+            }
+            catch { }
+
+            if (_gameFont != null) return _gameFont;
+
             var texts = Resources.FindObjectsOfTypeAll<Text>();
             foreach (var t in texts)
             {
@@ -93,16 +105,7 @@ namespace InventoryMaster.UI
                 }
             }
 
-            try
-            {
-                _gameFont = Font.CreateDynamicFontFromOSFont(new[] { "Arial", "Segoe UI", "Tahoma" }, 14);
-            }
-            catch { }
-
-            if (_gameFont == null)
-            {
-                _gameFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            }
+            _gameFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
             return _gameFont;
         }
 
@@ -172,54 +175,64 @@ namespace InventoryMaster.UI
             winRt.anchorMax = new Vector2(0.5f, 0.5f);
             winRt.pivot = new Vector2(0.5f, 0.5f);
             winRt.anchoredPosition = Vector2.zero;
-            winRt.sizeDelta = new Vector2(1040, 640);
-            winRt.localScale = new Vector3(1.15f, 1.15f, 1.0f);
+            winRt.sizeDelta = new Vector2(1080, 660);
+            winRt.localScale = Vector3.one; // 1:1 Pixel-Perfect Sharpness! Zero Blur!
 
             var winImg = _modWindowGO.AddComponent<Image>();
             winImg.color = WoodWindowBg;
 
-            // Outer Timber Border
-            var outerBorder = CreateBox(_modWindowGO.transform, "WoodFrameBorder", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, WoodWindowBorder);
-            var obRt = outerBorder.GetComponent<RectTransform>();
-            obRt.offsetMin = new Vector2(-4, -4);
-            obRt.offsetMax = new Vector2(4, 4);
-            outerBorder.transform.SetAsFirstSibling();
+            var winOutline = _modWindowGO.AddComponent<Outline>();
+            winOutline.effectColor = WoodWindowBorder;
+            winOutline.effectDistance = new Vector2(5, -5);
 
-            // Title Bar
-            var titleBar = CreateBox(_modWindowGO.transform, "TitleBar", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 50), WoodTitleBar);
+            // 1. Title Bar
+            var titleBar = CreateBox(_modWindowGO.transform, "TitleBar", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 56), WoodTitleBar);
             CreateBox(titleBar.transform, "TitleAccent", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 3), WoodTrimAccent);
 
-            var titleText = CreateText(titleBar.transform, "TitleText", $"🎒 <color=#F5C761><b>INVENTORY MASTER</b></color> <size=13><color=#C7A670>v{PluginInfo.PLUGIN_VERSION}</color></size> — <size=13><color=#E6CEAC>Quality-of-Life & Inventory Management</color></size>", 18, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleLeft);
-            titleText.rectTransform.offsetMin = new Vector2(18, 0);
-            titleText.rectTransform.offsetMax = new Vector2(-60, 0);
+            var titleText = CreateText(titleBar.transform, "TitleText", $"🎒 <color=#FFD54F><b>INVENTORY MASTER</b></color> <size=14><color=#FFE082>v{PluginInfo.PLUGIN_VERSION}</color></size> — <size=14><color=#F5EADB>Quality-of-Life & Inventory Management</color></size>", 20, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleLeft);
+            titleText.rectTransform.offsetMin = new Vector2(20, 0);
+            titleText.rectTransform.offsetMax = new Vector2(-70, 0);
 
             // Close Button [✕]
-            CreateButton(titleBar.transform, "Btn_Close", "✕", new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(1, 0.5f), new Vector2(-12, 0), new Vector2(32, 32), () => ToggleWindow(), CheckboxWoodBg, TextParchmentLight, 16);
+            var closeBtnGO = new GameObject("Btn_Close");
+            closeBtnGO.transform.SetParent(titleBar.transform, false);
+            var closeRt = closeBtnGO.AddComponent<RectTransform>();
+            closeRt.anchorMin = new Vector2(1, 0.5f);
+            closeRt.anchorMax = new Vector2(1, 0.5f);
+            closeRt.pivot = new Vector2(1, 0.5f);
+            closeRt.sizeDelta = new Vector2(42, 36);
+            closeRt.anchoredPosition = new Vector2(-12, 0);
+            var closeImg = closeBtnGO.AddComponent<Image>();
+            closeImg.color = ButtonCloseRed;
+            var closeBtn = closeBtnGO.AddComponent<Button>();
+            closeBtn.onClick.AddListener(() => ToggleWindow());
+            var closeTxt = CreateText(closeBtnGO.transform, "Txt", "✕", 18, FontStyle.Bold, Color.white, TextAnchor.MiddleCenter);
+            FillParent(closeTxt.gameObject);
 
-            // Tabs Row
-            var tabRow = CreateBox(_modWindowGO.transform, "TabRow", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -56), new Vector2(-28, 40), Color.clear);
+            // 2. Tabs Row
+            var tabRow = CreateBox(_modWindowGO.transform, "TabRow", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -62), new Vector2(-28, 44), Color.clear);
             var tabLayout = tabRow.AddComponent<HorizontalLayoutGroup>();
             tabLayout.spacing = 8;
             tabLayout.childForceExpandWidth = true;
             tabLayout.childForceExpandHeight = true;
 
-            string[] tabNames = { "🎒 BACKPACK & CAPACITY", "✂️ CONTROLS & TRANSFER", "🧲 AUTOMATION & REFILL", "🛡️ SAFETY & RECOVERY" };
+            string[] tabNames = { "🎒 BACKPACK & ACTIONS", "✂️ SMART SPLIT & TRANSFER", "🧲 VACUUM PICKUP & REFILL", "🛡️ SAFETY & PROTECTION" };
             for (int i = 0; i < tabNames.Length; i++)
             {
                 int index = i;
-                var tabBtn = CreateButton(tabRow.transform, $"TabBtn_{i}", tabNames[i], Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, () => SelectTab(index), TabInactiveBg, TabInactiveText, 15);
+                var tabBtn = CreateButton(tabRow.transform, $"TabBtn_{i}", tabNames[i], Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, () => SelectTab(index), TabInactiveBg, TabInactiveText, 14);
                 _tabButtonImages[i] = tabBtn.GetComponent<Image>();
                 _tabButtonTexts[i] = tabBtn.GetComponentInChildren<Text>();
             }
 
-            // Wooden Trim line separating tabs from content
-            CreateBox(_modWindowGO.transform, "TabTrimLine", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -100), new Vector2(-28, 3), WoodTrimAccent);
+            // Trim line under tabs
+            CreateBox(_modWindowGO.transform, "TabTrimLine", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), new Vector2(0, -110), new Vector2(-28, 3), WoodTrimAccent);
 
-            // Tab Content Area
+            // 3. Tab Content Area
             var contentArea = CreateBox(_modWindowGO.transform, "ContentArea", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, Color.clear);
             var cRt = contentArea.GetComponent<RectTransform>();
-            cRt.offsetMin = new Vector2(18, 42);
-            cRt.offsetMax = new Vector2(-18, -108);
+            cRt.offsetMin = new Vector2(18, 48);
+            cRt.offsetMax = new Vector2(-18, -118);
 
             // Build individual tab pages
             _tabPages[0] = BuildBackpackTab(contentArea.transform);
@@ -229,10 +242,10 @@ namespace InventoryMaster.UI
 
             SelectTab(0);
 
-            // Fixed Hotkeys Footer Bar (Showing F2 for Menu - Zero conflict with Sailor's Companion)
-            var footerBar = CreateBox(_modWindowGO.transform, "FooterBar", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 42), WoodTitleBar);
+            // 4. Fixed Hotkeys Footer Bar
+            var footerBar = CreateBox(_modWindowGO.transform, "FooterBar", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 44), WoodTitleBar);
             CreateBox(footerBar.transform, "FooterAccent", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 2), WoodTrimAccent);
-            CreateText(footerBar.transform, "FooterText", "<color=#C7A670>Hotkeys:</color> <color=#F5C761>[F2]</color> Menu  |  <color=#F5C761>[Z]</color> Auto Sort  |  <color=#F5C761>[X]</color> Dump to Chest  |  <color=#F5C761>[V]</color> Hotbar Swap  |  <color=#F5C761>[Alt+Click]</color> Lock Slot  |  <color=#F5C761>[Delete]</color> Trash  |  <color=#F5C761>[ESC]</color> Close", 14, FontStyle.Bold, TextParchmentLight, TextAnchor.MiddleCenter);
+            CreateText(footerBar.transform, "FooterText", "<color=#FFD54F><b>Hotkeys:</b></color> <color=#FFFFFF>[F2]</color> Menu   |   <color=#FFFFFF>[Z]</color> Auto Sort   |   <color=#FFFFFF>[X]</color> Dump to Chest   |   <color=#FFFFFF>[V]</color> Hotbar Swap   |   <color=#FFFFFF>[Alt+Click]</color> Lock Slot   |   <color=#FFFFFF>[ESC]</color> Close", 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleCenter);
         }
 
         private void SelectTab(int index)
@@ -255,24 +268,27 @@ namespace InventoryMaster.UI
         {
             var page = CreateTabPage(parent, "Page_Backpack");
 
-            CreateSectionBanner(page.transform, "✨ INVENTORY ACTIONS & MANAGEMENT");
+            CreateSectionBanner(page.transform, "⚡ INSTANT INVENTORY ACTIONS");
 
-            CreateDualActionButton(page.transform,
-                "✨ Auto Sort Backpack [Z]", () => InventorySorter.SortCurrentInventory(),
-                "✨ Auto Sort Open Chest [Z]", () => InventorySorter.SortCurrentInventory());
+            // Sleek, sculpted action tiles with distinct hotkey badges!
+            CreateDualActionTiles(page.transform,
+                "⚡ Auto Sort Backpack", "[Z] KEY", () => InventorySorter.SortCurrentInventory(),
+                "⚡ Auto Sort Open Chest", "[Z] KEY", () => InventorySorter.SortCurrentInventory());
 
-            CreateDualActionButton(page.transform,
-                "📥 Dump Backpack to Chest [X]", () => StorageDumpManager.DumpBackpackToOpenStorage(),
-                "🔄 Swap Hotbar with Backpack Row 1 [V]", () => HotbarExpansionManager.SwapHotbarRow());
+            CreateDualActionTiles(page.transform,
+                "📥 Dump Backpack to Chest", "[X] KEY", () => StorageDumpManager.DumpBackpackToOpenStorage(),
+                "🔄 Swap Hotbar with Row 1", "[V] KEY", () => HotbarExpansionManager.SwapHotbarRow());
 
             CreateSectionBanner(page.transform, "🎒 BACKPACK EXPANSION & CAPACITY");
 
             CreateToggleItem(page.transform, "Permanent Backpack Slots Unlock (All 15 slots permanently active)", Plugin.EnableInventoryExpansion.Value, val => Plugin.EnableInventoryExpansion.Value = val);
 
-            var infoBox = CreateBox(page.transform, "BackpackInfo", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 52), WoodPlankEven);
-            EnsureLayout(infoBox, -1, 52);
-            var infoText = CreateText(infoBox.transform, "InfoTxt", "• <b>Hotbar Swap (V):</b> Instantly swaps your 10 active hotbar slots with Row 1 of your backpack.\n• <b>Auto Sort (Z):</b> Merges partial stacks and categorizes items by Tools, Gear, Food, and Resources.", 13, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            infoText.rectTransform.offsetMin = new Vector2(14, 0);
+            // Info Plaque
+            var infoBox = CreateBox(page.transform, "BackpackInfo", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 72), WoodPlankEven);
+            EnsureLayout(infoBox, -1, 72);
+            var infoText = CreateText(infoBox.transform, "InfoTxt", "• <color=#FFD54F><b>Hotbar Row Swap [V]:</b></color> Instantly swaps your 10 active hotbar slots with Row 1 of your backpack.\n• <color=#FFD54F><b>Auto Sort [Z]:</b></color> Automatically merges partial stacks and categorizes items by Tools, Equipment, Consumables, and Resources.", 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+            infoText.lineSpacing = 1.25f;
+            infoText.rectTransform.offsetMin = new Vector2(16, 0);
 
             return page;
         }
@@ -283,15 +299,16 @@ namespace InventoryMaster.UI
 
             CreateSectionBanner(page.transform, "✂️ SMART ITEM SPLITTING & BULK TRANSFERS");
 
-            CreateToggleItem(page.transform, "Smart Item Split (Shift+RightClick = 1, Ctrl+RightClick = Half stack)", Plugin.EnableSmartSplit.Value, val => Plugin.EnableSmartSplit.Value = val);
-            CreateToggleItem(page.transform, "Fast Item Transfer (Double-Click to move all stacks of this item)", Plugin.EnableFastItemTransfer.Value, val => Plugin.EnableFastItemTransfer.Value = val);
+            CreateToggleItem(page.transform, "Smart Item Split (Shift+RightClick = 1 Item, Ctrl+RightClick = Half Stack)", Plugin.EnableSmartSplit.Value, val => Plugin.EnableSmartSplit.Value = val);
+            CreateToggleItem(page.transform, "Fast Bulk Item Transfer (Double-Click item in chest/backpack to move all stacks)", Plugin.EnableFastItemTransfer.Value, val => Plugin.EnableFastItemTransfer.Value = val);
 
-            CreateSectionBanner(page.transform, "💡 HOW TO USE CONTROLS");
+            CreateSectionBanner(page.transform, "📖 HOW TO USE INVENTORY CONTROLS");
 
-            var infoBox = CreateBox(page.transform, "ControlsInfo", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 94), WoodPlankEven);
-            EnsureLayout(infoBox, -1, 94);
-            var infoText = CreateText(infoBox.transform, "ControlsInfoText", "• <b>Shift + Right Click:</b> Quickly takes exactly <b>1 item</b> into the next available empty slot.\n• <b>Ctrl + Right Click:</b> Splits exactly <b>half the stack</b> into the next available empty slot.\n• <b>Double Left-Click:</b> When viewing a storage chest, double-clicking any item instantly transfers <b>all matching stacks</b> between your backpack and the chest!", 13, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            infoText.rectTransform.offsetMin = new Vector2(14, 0);
+            var infoBox = CreateBox(page.transform, "ControlsInfo", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 105), WoodPlankEven);
+            EnsureLayout(infoBox, -1, 105);
+            var infoText = CreateText(infoBox.transform, "ControlsInfoText", "• <color=#FFD54F><b>Shift + Right Click:</b></color> Takes exactly <b>1 item</b> from stack into next available empty slot.\n• <color=#FFD54F><b>Ctrl + Right Click:</b></color> Splits exactly <b>half the stack</b> into next available empty slot.\n• <color=#FFD54F><b>Double Left-Click:</b></color> When interacting with a storage chest, double-clicking any item instantly transfers <b>all matching stacks</b> between your backpack and chest!", 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+            infoText.lineSpacing = 1.25f;
+            infoText.rectTransform.offsetMin = new Vector2(16, 0);
 
             return page;
         }
@@ -300,7 +317,7 @@ namespace InventoryMaster.UI
         {
             var page = CreateTabPage(parent, "Page_Automation");
 
-            CreateSectionBanner(page.transform, "🧲 AUTO PICKUP & CONTEXT TOOL SWITCHING");
+            CreateSectionBanner(page.transform, "🧲 VACUUM PICKUP & CONTEXT TOOL SWITCHING");
 
             CreateToggleItem(page.transform, "Auto Pickup Nearby Debris & Loose Items (Collects directly into pocket)", Plugin.EnableAutoPickup.Value, val => Plugin.EnableAutoPickup.Value = val);
             CreateStepperItem(page.transform, "Auto Pickup Radius", 2f, 12f, 1f, Plugin.AutoPickupRadius.Value, "m", val => Plugin.AutoPickupRadius.Value = val);
@@ -308,7 +325,7 @@ namespace InventoryMaster.UI
 
             CreateSectionBanner(page.transform, "💧 AUTO REFILL VITAL CONSUMABLES");
 
-            CreateToggleItem(page.transform, "Auto Refill Fresh Water & Cooked Food (Strictly avoids salt water/poison)", Plugin.EnableAutoRefill.Value, val => Plugin.EnableAutoRefill.Value = val);
+            CreateToggleItem(page.transform, "Auto Refill Fresh Water & Cooked Food (Strictly avoids saltwater & raw food)", Plugin.EnableAutoRefill.Value, val => Plugin.EnableAutoRefill.Value = val);
             CreateStepperItem(page.transform, "Refill Stats Threshold", 0.1f, 0.5f, 0.05f, Plugin.AutoRefillThreshold.Value, "%", val => Plugin.AutoRefillThreshold.Value = val);
 
             return page;
@@ -318,25 +335,26 @@ namespace InventoryMaster.UI
         {
             var page = CreateTabPage(parent, "Page_Safety");
 
-            CreateSectionBanner(page.transform, "🛡️ DROP PROTECTION & FAVORITE ITEM LOCKS");
+            CreateSectionBanner(page.transform, "🛡️ ACCIDENTAL DROP PROTECTION & SAFETY");
 
             CreateToggleItem(page.transform, "Enable Drop Protection (Blocks accidental Q drops; hold Shift+Q to drop)", Plugin.EnableDropProtection.Value, val => Plugin.EnableDropProtection.Value = val);
             CreateToggleItem(page.transform, "Strict Drop Guard for Weapons, Tools & Armor", Plugin.ProtectToolsAndEquipment.Value, val => Plugin.ProtectToolsAndEquipment.Value = val);
 
-            CreateDualActionButton(page.transform,
-                "🔓 Clear All Favorite Item Locks", () =>
+            CreateDualActionTiles(page.transform,
+                "🔓 Clear All Favorite Item Locks", "RESET", () =>
                 {
                     FavoriteLockManager.ClearAll();
                     ToastManager.Show("🔓 All slot locks have been cleared!");
                 },
-                "↩️ Restore Last Trashed Item (Undo)", () => TrashSlotManager.UndoTrash());
+                "↩️ Restore Last Trashed Item", "UNDO", () => TrashSlotManager.UndoTrash());
 
-            CreateSectionBanner(page.transform, "💡 QUICK HINTS & GUIDE");
+            CreateSectionBanner(page.transform, "📖 FAVORITE LOCKS & TRASH GUIDE");
 
-            var infoBox = CreateBox(page.transform, "InfoBox", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 72), WoodPlankEven);
-            EnsureLayout(infoBox, -1, 72);
-            var infoText = CreateText(infoBox.transform, "InfoText", "• <b>Favorite Lock:</b> Press <b>Alt + Left Click</b> on any slot to lock/unlock. Shows 🔒 badge.\n• <b>Trash Slot:</b> Hover over unwanted items and press <b>Delete</b> to trash them safely.\n• <b>Undo Buffer:</b> Trashed by mistake? Click the Undo button above to recover your item!", 13, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            infoText.rectTransform.offsetMin = new Vector2(14, 0);
+            var infoBox = CreateBox(page.transform, "InfoBox", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 84), WoodPlankEven);
+            EnsureLayout(infoBox, -1, 84);
+            var infoText = CreateText(infoBox.transform, "InfoText", "• <color=#FFD54F><b>Favorite Item Lock:</b></color> Press <b>Alt + Left Click</b> on any slot to toggle lock (renders 🔒 badge; immune to sort/dump/drop).\n• <color=#FFD54F><b>Trash Slot:</b></color> Hover over unwanted items and press <b>Delete</b> to safely incinerate them.\n• <color=#FFD54F><b>Undo Buffer:</b></color> Accidentally trashed an item? Click the Undo button above to immediately recover it!", 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+            infoText.lineSpacing = 1.25f;
+            infoText.rectTransform.offsetMin = new Vector2(16, 0);
 
             return page;
         }
@@ -347,10 +365,12 @@ namespace InventoryMaster.UI
         {
             var page = CreateBox(parent, name, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, Color.clear);
             var layout = page.AddComponent<VerticalLayoutGroup>();
-            layout.spacing = 6;
+            layout.spacing = 8;
             layout.padding = new RectOffset(12, 12, 6, 6);
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true; // Control height cleanly without expanding!
             return page;
         }
 
@@ -358,44 +378,150 @@ namespace InventoryMaster.UI
         {
             var banner = CreateBox(parent, "Banner", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 32), WoodTitleBar);
             EnsureLayout(banner, -1, 32);
-            CreateText(banner.transform, "Txt", $"─── {title} ───", 13, FontStyle.Bold, TextGoldHeading, TextAnchor.MiddleCenter);
+
+            CreateBox(banner.transform, "TopTrim", new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1), Vector2.zero, new Vector2(0, 1.5f), WoodTrimAccent);
+            CreateBox(banner.transform, "BotTrim", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 1.5f), WoodTrimAccent);
+
+            CreateText(banner.transform, "Txt", $"─── {title} ───", 14, FontStyle.Bold, TextGoldHeading, TextAnchor.MiddleCenter);
         }
 
-        private void CreateDualActionButton(Transform parent, string label1, Action action1, string label2, Action action2)
+        private void CreateDualActionTiles(Transform parent, string title1, string hotkey1, Action action1, string title2, string hotkey2, Action action2)
         {
-            var row = CreateBox(parent, "DualActionRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 38), Color.clear);
-            EnsureLayout(row, -1, 38);
+            var row = CreateBox(parent, "DualActionRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 50), Color.clear);
+            EnsureLayout(row, -1, 50);
 
             var layout = row.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 8;
+            layout.spacing = 12;
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = true;
+            layout.childControlWidth = true;
+            layout.childControlHeight = true;
 
-            var btn1 = CreateButton(row.transform, "Btn1", label1, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, action1, WoodButtonNormal, TextParchmentLight, 15);
-            var btn2 = CreateButton(row.transform, "Btn2", label2, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, action2, WoodButtonNormal, TextParchmentLight, 15);
+            CreateActionTile(row.transform, "Tile1", title1, hotkey1, action1);
+            CreateActionTile(row.transform, "Tile2", title2, hotkey2, action2);
+        }
+
+        private GameObject CreateActionTile(Transform parent, string name, string title, string hotkey, Action onClick)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.sizeDelta = Vector2.zero;
+
+            var img = go.AddComponent<Image>();
+            img.color = ActionTileBg;
+
+            var outline = go.AddComponent<Outline>();
+            outline.effectColor = ActionTileBorder;
+            outline.effectDistance = new Vector2(2, -2);
+
+            var btn = go.AddComponent<Button>();
+            btn.targetGraphic = img;
+            var cb = btn.colors;
+            cb.normalColor = ActionTileBg;
+            cb.highlightedColor = ActionTileHover;
+            cb.pressedColor = new Color(0.20f, 0.12f, 0.06f, 1.0f);
+            cb.selectedColor = ActionTileBg;
+            btn.colors = cb;
+
+            if (onClick != null) btn.onClick.AddListener(() => onClick());
+
+            // Inner Layout: Title on Left, Hotkey Chip on Right
+            var innerLayout = go.AddComponent<HorizontalLayoutGroup>();
+            innerLayout.padding = new RectOffset(16, 16, 4, 4);
+            innerLayout.childForceExpandWidth = false;
+            innerLayout.childForceExpandHeight = true;
+            innerLayout.childControlWidth = false;
+            innerLayout.childControlHeight = true;
+
+            // Title Text
+            var titleGO = new GameObject("Title");
+            titleGO.transform.SetParent(go.transform, false);
+            var titleTxt = titleGO.AddComponent<Text>();
+            titleTxt.font = GetGameFont();
+            titleTxt.text = title;
+            titleTxt.fontSize = 15;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.color = TextWhite;
+            titleTxt.alignment = TextAnchor.MiddleLeft;
+            titleTxt.supportRichText = true;
+            var titleLe = titleGO.AddComponent<LayoutElement>();
+            titleLe.flexibleWidth = 1f;
+
+            // Hotkey Badge Chip
+            var chipGO = new GameObject("HotkeyChip");
+            chipGO.transform.SetParent(go.transform, false);
+            var chipLe = chipGO.AddComponent<LayoutElement>();
+            chipLe.preferredWidth = 78;
+            chipLe.preferredHeight = 32;
+
+            var chipImg = chipGO.AddComponent<Image>();
+            chipImg.color = new Color(0.12f, 0.07f, 0.03f, 0.95f);
+            var chipOutline = chipGO.AddComponent<Outline>();
+            chipOutline.effectColor = new Color(1.0f, 0.82f, 0.35f, 0.7f);
+            chipOutline.effectDistance = new Vector2(1, -1);
+
+            var chipTxtGO = new GameObject("ChipText");
+            chipTxtGO.transform.SetParent(chipGO.transform, false);
+            var chipTxtRt = chipTxtGO.AddComponent<RectTransform>();
+            chipTxtRt.anchorMin = Vector2.zero;
+            chipTxtRt.anchorMax = Vector2.one;
+            chipTxtRt.offsetMin = Vector2.zero;
+            chipTxtRt.offsetMax = Vector2.zero;
+
+            var chipTxt = chipTxtGO.AddComponent<Text>();
+            chipTxt.font = GetGameFont();
+            chipTxt.text = hotkey;
+            chipTxt.fontSize = 12;
+            chipTxt.fontStyle = FontStyle.Bold;
+            chipTxt.color = TextGoldHeading;
+            chipTxt.alignment = TextAnchor.MiddleCenter;
+
+            return go;
         }
 
         private void CreateToggleItem(Transform parent, string label, bool initialValue, Action<bool> onToggle)
         {
             Color plankColor = (_toggleCounter++ % 2 == 0) ? WoodPlankEven : WoodPlankOdd;
-            var row = CreateBox(parent, "ToggleRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 38), plankColor);
-            EnsureLayout(row, -1, 38);
+            var row = CreateBox(parent, "ToggleRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 42), plankColor);
+            EnsureLayout(row, -1, 42);
 
             CreateBox(row.transform, "Seam", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 1), WoodRowBorder);
 
             var layout = row.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 10;
-            layout.padding = new RectOffset(14, 14, 2, 2);
+            layout.spacing = 12;
+            layout.padding = new RectOffset(16, 16, 2, 2);
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
+            layout.childControlHeight = true;
+            layout.childControlWidth = false;
 
-            var labelTxt = CreateText(row.transform, "Label", label, 15, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            EnsureLayout(labelTxt.gameObject, 860, 32, true);
+            var labelGO = new GameObject("Label");
+            labelGO.transform.SetParent(row.transform, false);
+            var labelTxt = labelGO.AddComponent<Text>();
+            labelTxt.font = GetGameFont();
+            labelTxt.text = label;
+            labelTxt.fontSize = 15;
+            labelTxt.fontStyle = FontStyle.Normal;
+            labelTxt.color = TextParchmentLight;
+            labelTxt.alignment = TextAnchor.MiddleLeft;
+            labelTxt.supportRichText = true;
+            var labelLe = labelGO.AddComponent<LayoutElement>();
+            labelLe.preferredWidth = 860;
+            labelLe.preferredHeight = 36;
+            labelLe.flexibleWidth = 1f;
 
-            var checkContainer = CreateBox(row.transform, "CheckContainer", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(28, 28), CheckboxWoodBg);
-            EnsureLayout(checkContainer, 28, 28, false);
+            // Custom Sculpted Checkbox
+            var checkContainer = CreateBox(row.transform, "CheckContainer", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(30, 30), CheckboxWoodBg);
+            EnsureLayout(checkContainer, 30, 30, false);
+            var checkOutline = checkContainer.AddComponent<Outline>();
+            checkOutline.effectColor = new Color(0.88f, 0.70f, 0.38f, 0.8f);
+            checkOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
-            var checkTxt = CreateText(checkContainer.transform, "Checkmark", initialValue ? "✔" : "", 16, FontStyle.Bold, CheckmarkGold, TextAnchor.MiddleCenter);
+            var checkTxt = CreateText(checkContainer.transform, "Checkmark", initialValue ? "✔" : "", 18, FontStyle.Bold, CheckmarkGold, TextAnchor.MiddleCenter);
 
             bool state = initialValue;
             var btn = checkContainer.AddComponent<Button>();
@@ -418,40 +544,40 @@ namespace InventoryMaster.UI
         private void CreateStepperItem(Transform parent, string label, float min, float max, float step, float initialValue, string unit, Action<float> onChange)
         {
             Color plankColor = (_toggleCounter++ % 2 == 0) ? WoodPlankEven : WoodPlankOdd;
-            var row = CreateBox(parent, "StepperRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 38), plankColor);
-            EnsureLayout(row, -1, 38);
+            var row = CreateBox(parent, "StepperRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 42), plankColor);
+            EnsureLayout(row, -1, 42);
 
             CreateBox(row.transform, "Seam", new Vector2(0, 0), new Vector2(1, 0), new Vector2(0.5f, 0), Vector2.zero, new Vector2(0, 1), WoodRowBorder);
 
             var layout = row.AddComponent<HorizontalLayoutGroup>();
-            layout.spacing = 10;
-            layout.padding = new RectOffset(14, 14, 2, 2);
+            layout.spacing = 12;
+            layout.padding = new RectOffset(16, 16, 2, 2);
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
             float val = initialValue;
             string displayVal = unit == "%" ? $"{Mathf.RoundToInt(val * 100)}%" : $"{val:F0}{unit}";
 
-            var labelTxt = CreateText(row.transform, "Label", $"{label}: <color=#F5C761><b>{displayVal}</b></color>", 15, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
-            EnsureLayout(labelTxt.gameObject, 800, 32, true);
+            var labelTxt = CreateText(row.transform, "Label", $"{label}: <color=#FFD54F><b>{displayVal}</b></color>", 15, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+            EnsureLayout(labelTxt.gameObject, 800, 34, true);
 
-            var minusBtn = CreateButton(row.transform, "Minus", "  －  ", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(44, 28), () =>
+            var minusBtn = CreateButton(row.transform, "Minus", "  －  ", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(46, 32), () =>
             {
                 val = Mathf.Clamp(val - step, min, max);
                 displayVal = unit == "%" ? $"{Mathf.RoundToInt(val * 100)}%" : $"{val:F0}{unit}";
-                labelTxt.text = $"{label}: <color=#F5C761><b>{displayVal}</b></color>";
+                labelTxt.text = $"{label}: <color=#FFD54F><b>{displayVal}</b></color>";
                 onChange?.Invoke(val);
-            }, WoodButtonNormal, TextParchmentLight, 15);
-            EnsureLayout(minusBtn, 44, 28, false);
+            }, ButtonWoodNormal, TextWhite, 15);
+            EnsureLayout(minusBtn, 46, 32, false);
 
-            var plusBtn = CreateButton(row.transform, "Plus", "  ＋  ", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(44, 28), () =>
+            var plusBtn = CreateButton(row.transform, "Plus", "  ＋  ", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(46, 32), () =>
             {
                 val = Mathf.Clamp(val + step, min, max);
                 displayVal = unit == "%" ? $"{Mathf.RoundToInt(val * 100)}%" : $"{val:F0}{unit}";
-                labelTxt.text = $"{label}: <color=#F5C761><b>{displayVal}</b></color>";
+                labelTxt.text = $"{label}: <color=#FFD54F><b>{displayVal}</b></color>";
                 onChange?.Invoke(val);
-            }, WoodButtonNormal, TextParchmentLight, 15);
-            EnsureLayout(plusBtn, 44, 28, false);
+            }, ButtonWoodNormal, TextWhite, 15);
+            EnsureLayout(plusBtn, 46, 32, false);
         }
 
         private GameObject CreateBox(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPos, Vector2 sizeDelta, Color color)
@@ -504,11 +630,15 @@ namespace InventoryMaster.UI
             var img = go.AddComponent<Image>();
             img.color = bgColor;
 
+            var outline = go.AddComponent<Outline>();
+            outline.effectColor = ActionTileBorder * 0.7f;
+            outline.effectDistance = new Vector2(1.5f, -1.5f);
+
             var btn = go.AddComponent<Button>();
             btn.targetGraphic = img;
             var cb = btn.colors;
             cb.normalColor = bgColor;
-            cb.highlightedColor = WoodButtonHover;
+            cb.highlightedColor = ActionTileHover;
             cb.pressedColor = WoodWindowBorder;
             cb.selectedColor = bgColor;
             btn.colors = cb;
@@ -540,12 +670,22 @@ namespace InventoryMaster.UI
             if (prefWidth >= 0) le.preferredWidth = prefWidth;
             if (prefHeight >= 0) le.preferredHeight = prefHeight;
             le.flexibleWidth = flexibleWidth ? 1f : 0f;
+            le.flexibleHeight = 0f; // Strictly prevent vertical stretching into giant voids!
             return le;
+        }
+
+        private void FillParent(GameObject go)
+        {
+            var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
         }
         #endregion
     }
     // ============================================================================
-    // [END] UI: CANVAS INVENTORY MASTER MOD MENU
+    // [END] CANVAS INVENTORY MASTER SETTINGS UI
     // ============================================================================
     #endregion
 }
