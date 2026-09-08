@@ -7,5 +7,7 @@
   "targetVersion": "1.09",
   "gameVersion": "1.09 / Update 13.01",
   "isModPermanent": false,
+  "icon": "icon.png",
+  "banner": "banner.png",
   "license": "MIT"
 }

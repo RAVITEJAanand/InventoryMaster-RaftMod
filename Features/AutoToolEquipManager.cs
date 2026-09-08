@@ -60,18 +60,7 @@ namespace InventoryMaster.Features
                     desiredToolKeyword = "axe";
                 }
                 // 2. Hook Context (Ocean flotsam, debris, floating crates/barrels, reef nodes)
-                else if (hitGO.GetComponentInParent<PickupItem>() != null ||
-                         goName.IndexOf("flotsam", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("plank", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("debris", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("plastic", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("reef", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("clay", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("sand", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("scrap", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                         goName.IndexOf("ore", StringComparison.OrdinalIgnoreCase) >= 0)
+                else if (IsEligibleDebrisOrReef(hitGO, goName))
                 {
                     desiredToolKeyword = "hook";
                 }
@@ -196,6 +185,31 @@ namespace InventoryMaster.Features
 
                 ToastManager.Show($"🔄 Auto-equipped replacement {replBase.UniqueName}!");
             }
+        }
+
+        private static bool IsEligibleDebrisOrReef(GameObject hitGO, string goName)
+        {
+            var pickup = hitGO.GetComponentInParent<PickupItem>();
+            if (pickup != null)
+            {
+                if (pickup is ItemNet || pickup.pickupItemType != PickupItemType.Default) return false;
+                if (pickup.GetComponentInParent<Block>() != null) return false;
+                if (pickup.GetComponent<ItemCollector>() != null) return false;
+                if (pickup.isDropped) return false;
+                return true;
+            }
+
+            return goName.IndexOf("flotsam", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("barrel", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("crate", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("plank", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("debris", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("plastic", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("reef", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("clay", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("sand", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("scrap", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   goName.IndexOf("ore", StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
     // ============================================================================

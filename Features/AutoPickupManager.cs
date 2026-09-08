@@ -36,6 +36,14 @@ namespace InventoryMaster.Features
             {
                 if (p == null || !p.canBePickedUp || p.gameObject == null || !p.gameObject.activeInHierarchy) continue;
 
+                // CRITICAL FIX: Never pick up Collection Nets, Animals, or Raft Structures!
+                if (p is ItemNet || p.pickupItemType != PickupItemType.Default) continue;
+                if (p.GetComponentInParent<Block>() != null) continue;
+                if (p.GetComponent<ItemCollector>() != null) continue;
+
+                // CRITICAL FIX: Never auto-pickup items intentionally dropped by the player!
+                if (p.isDropped) continue;
+
                 float dist = Vector3.Distance(playerPos, p.transform.position);
                 if (dist > radius) continue;
 
