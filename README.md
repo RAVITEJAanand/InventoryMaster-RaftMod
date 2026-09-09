@@ -13,7 +13,7 @@
 **Inventory Master** is a dedicated Quality-of-Life inventory management mod for **Raft**, purposefully crafted to work in complete harmony alongside **Sailor's Companion**. 
 
 All features in Inventory Master are 100% unique, preventing duplicate patches or feature overlaps:
-- **Sailor's Companion** handles: Raft Navigation, Teleport/Recall, Sails, Engines, World Cheats, Research Blueprints, Item Spawner, Craft from Storage, and Increased Stack Size.
+- **Sailor's Companion** ([Nexus Mods #155](https://www.nexusmods.com/raft/mods/155) / [GitHub](https://github.com/RAVITEJAanand/SailorsCompanion-RaftMod)) handles: Raft Navigation, Teleport/Recall, Sails, Engines, World Cheats, Research Blueprints, Item Spawner, Craft from Storage, and Increased Stack Size.
 - **Inventory Master** handles: Auto Sort (Backpack & Chests), Permanent 15-slot Backpack Expansion, 20-slot Hotbar Row Swap, Auto Pickup Nearby Items (5m sweep), Drop Protection, Smart Item Split, Context Auto Tool Equip & Replace Broken, Fast Bulk Transfer (Double-Click), Storage Dump (One-Click), Favorite Items Lock with `🔒` Badges, Trash Slot with Undo, and Auto Refill Potable Water & Cooked Food.
 
 ---
