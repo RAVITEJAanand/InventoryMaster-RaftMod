@@ -17,7 +17,7 @@ namespace InventoryMaster.Patches
         private static Item_Base _itemBeforeBreak = null;
         private static bool _wasHotbarSlot = false;
 
-        static void Prefix(PlayerInventory __instance, Slot slot)
+        static void Prefix(PlayerInventory __instance, Slot slot, int stacksToRemove)
         {
             _itemBeforeBreak = null;
             _wasHotbarSlot = false;
@@ -32,7 +32,7 @@ namespace InventoryMaster.Patches
             }
         }
 
-        static void Postfix(PlayerInventory __instance, Slot slot, bool __result)
+        static void Postfix(PlayerInventory __instance, Slot slot, int stacksToRemove, bool __result)
         {
             // If __result is true, the tool just broke and was destroyed/consumed
             if (__result && _wasHotbarSlot && _itemBeforeBreak != null && (slot == null || slot.IsEmpty))
