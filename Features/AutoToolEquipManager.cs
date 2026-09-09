@@ -178,10 +178,9 @@ namespace InventoryMaster.Features
                 hotSlot.RefreshComponents();
                 replacementSlot.RefreshComponents();
 
-                if (playerInv.hotbar != null)
-                {
-                    playerInv.hotbar.ReselectCurrentSlot();
-                }
+                // NOTE: Do NOT call hotbar.ReselectCurrentSlot() here.
+                // That triggers UseItemController.Deselect() → ThrowableComponent.OnDeSelect()
+                // → ChargeMeter.Reset() which crashes if player holds a throwable when tool breaks.
 
                 ToastManager.Show($"🔄 Auto-equipped replacement {replBase.UniqueName}!");
             }
