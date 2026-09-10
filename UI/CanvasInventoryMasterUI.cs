@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using InventoryMaster.Helpers;
 using InventoryMaster.Features;
+using InventoryMaster.Patches;
 
 namespace InventoryMaster.UI
 {
@@ -120,16 +121,41 @@ namespace InventoryMaster.UI
 
             if (newState)
             {
+                try
+                {
+                    var cic = CustomInputConfig.Instance;
+                    if (cic != null)
+                    {
+                        cic.EnableInput();
+                        cic.SwitchCurrentActionMap("UI");
+                    }
+                }
+                catch { }
+
                 Helper.SetCursorVisibleAndLockState(true, CursorLockMode.None);
                 Instance.SelectTab(Instance._activeTab);
             }
             else
             {
+                bool peerModOpen = CursorPatchHelper.ShouldForceCursorFree();
                 try
                 {
-                    Helper.SetCursorVisibleAndLockState(false, CursorLockMode.Locked);
+                    var cic = CustomInputConfig.Instance;
+                    if (cic != null && !peerModOpen)
+                    {
+                        cic.SwitchCurrentActionMap("Player");
+                    }
                 }
                 catch { }
+
+                if (!peerModOpen)
+                {
+                    try
+                    {
+                        Helper.SetCursorVisibleAndLockState(false, CursorLockMode.Locked);
+                    }
+                    catch { }
+                }
             }
         }
 

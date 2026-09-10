@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using InventoryMaster.UI;
@@ -12,9 +13,52 @@ namespace InventoryMaster.Patches
     // ============================================================================
     public static class CursorPatchHelper
     {
+        private static PropertyInfo _scWindowProp;
+        private static PropertyInfo _fcWindowProp;
+        private static bool _typesResolved = false;
+
         public static bool ShouldForceCursorFree()
         {
-            return CanvasInventoryMasterUI.IsWindowOpen;
+            // 1. Inventory Master UI
+            if (CanvasInventoryMasterUI.IsWindowOpen) return true;
+
+            // 2. Peer Mods (Sailor's Companion & Farmer's Companion)
+            if (!_typesResolved) ResolvePeerTypes();
+
+            if (_scWindowProp != null)
+            {
+                try { if ((bool)_scWindowProp.GetValue(null)) return true; } catch { }
+            }
+            if (_fcWindowProp != null)
+            {
+                try { if ((bool)_fcWindowProp.GetValue(null)) return true; } catch { }
+            }
+
+            return false;
+        }
+
+        private static void ResolvePeerTypes()
+        {
+            try
+            {
+                foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    if (_scWindowProp == null)
+                    {
+                        var scType = asm.GetType("SailorsCompanion.UI.CanvasModUI");
+                        if (scType != null)
+                            _scWindowProp = scType.GetProperty("IsWindowOpen", BindingFlags.Public | BindingFlags.Static);
+                    }
+                    if (_fcWindowProp == null)
+                    {
+                        var fcType = asm.GetType("FarmersCompanion.UI.CanvasFarmersCompanionUI");
+                        if (fcType != null)
+                            _fcWindowProp = fcType.GetProperty("IsWindowOpen", BindingFlags.Public | BindingFlags.Static);
+                    }
+                }
+                if (_scWindowProp != null && _fcWindowProp != null) _typesResolved = true;
+            }
+            catch { }
         }
     }
 
