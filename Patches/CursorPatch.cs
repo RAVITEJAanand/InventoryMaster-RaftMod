@@ -18,6 +18,19 @@ namespace InventoryMaster.Patches
         }
     }
 
+    [HarmonyPatch(typeof(MouseLook), "Update")]
+    public static class MouseLookUpdatePatch
+    {
+        public static bool Prefix()
+        {
+            if (CursorPatchHelper.ShouldForceCursorFree())
+            {
+                return false; // Freeze camera rotation while Inventory Master UI is open!
+            }
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(Helper), "SetCursorVisibleAndLockState")]
     public static class HelperSetCursorVisibleAndLockStatePatch
     {
