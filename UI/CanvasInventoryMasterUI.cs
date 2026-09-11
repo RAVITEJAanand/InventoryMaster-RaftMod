@@ -138,12 +138,17 @@ namespace InventoryMaster.UI
             else
             {
                 bool peerModOpen = CursorPatchHelper.ShouldForceCursorFree();
+                // Only gameplay has a "Player" action map / locked cursor to return to -
+                // forcing those from the main menu (no player/world loaded) left the home
+                // screen's own UI buttons unable to receive clicks until restarting the game.
+                bool isInGame = ComponentManager<Raft>.Value != null || ComponentManager<Network_Player>.Value != null;
+
                 try
                 {
                     var cic = CustomInputConfig.Instance;
                     if (cic != null && !peerModOpen)
                     {
-                        cic.SwitchCurrentActionMap("Player");
+                        cic.SwitchCurrentActionMap(isInGame ? "Player" : "UI");
                     }
                 }
                 catch { }
@@ -152,7 +157,14 @@ namespace InventoryMaster.UI
                 {
                     try
                     {
-                        Helper.SetCursorVisibleAndLockState(false, CursorLockMode.Locked);
+                        if (isInGame)
+                        {
+                            Helper.SetCursorVisibleAndLockState(false, CursorLockMode.Locked);
+                        }
+                        else
+                        {
+                            Helper.SetCursorVisibleAndLockState(true, CursorLockMode.None);
+                        }
                     }
                     catch { }
                 }
