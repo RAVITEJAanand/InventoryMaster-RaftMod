@@ -1,7 +1,7 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "name": "Inventory Master",
   "downloadUrl": "https://github.com/RAVITEJAanand/InventoryMaster-RaftMod/releases",
   "raftModdingUrl": "https://raftmodding.com/",
-  "notes": "v1.0.4: Fixed main menu buttons becoming unresponsive after opening the F2 menu from the home screen's Mods Manager and closing it. Closing unconditionally switched to the \"Player\" input map and locked the cursor (meant for gameplay), which broke the home screen's own UI clicks since no player/world exists there. Now correctly switches to \"UI\" and frees the cursor when not in-game."
+  "notes": "v1.0.5: Added DIAGNOSTIC logging (Awake/Update/input-fallback) to help track down a report of the mod appearing not to function on some setups. No feature changes. If F2 still doesn't open the menu, check LogOutput.log for lines starting with 'DIAGNOSTIC:' and report them."
 }

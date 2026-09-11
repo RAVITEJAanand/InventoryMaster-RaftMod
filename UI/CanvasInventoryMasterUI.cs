@@ -81,8 +81,17 @@ namespace InventoryMaster.UI
             Instance = this;
             gameObject.hideFlags = HideFlags.HideAndDontSave;
             DontDestroyOnLoad(gameObject);
-            GetGameFont();
-            BuildCanvasUI();
+            Debug.Log("[Inventory Master] CanvasInventoryMasterUI.Awake() starting...");
+            try
+            {
+                GetGameFont();
+                BuildCanvasUI();
+                Debug.Log("[Inventory Master] CanvasInventoryMasterUI.Awake() completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[Inventory Master] CanvasInventoryMasterUI.Awake() FAILED: {ex}");
+            }
         }
 
         public Font GetGameFont()
@@ -171,8 +180,16 @@ namespace InventoryMaster.UI
             }
         }
 
+        private static bool _loggedFirstUpdate = false;
+
         private void Update()
         {
+            if (!_loggedFirstUpdate)
+            {
+                _loggedFirstUpdate = true;
+                Debug.Log($"[Inventory Master] DIAGNOSTIC: Update() loop is running (first frame at Time={Time.unscaledTime:F2}).");
+            }
+
             if ((Plugin.KeyMenu != null && InputHelper.WasKeyPressed(Plugin.KeyMenu.Value)) || InputHelper.WasKeyPressed(KeyCode.F2))
             {
                 ToggleWindow();

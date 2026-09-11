@@ -11,19 +11,41 @@ namespace InventoryMaster.Helpers
     // ============================================================================
     public static class InputHelper
     {
+        private static bool _legacyInputAvailable = true;
+        private static bool _loggedFallbackSwitch = false;
+        private static bool _loggedNullKeyboard = false;
+
         public static bool WasKeyPressed(KeyCode legacyKey)
         {
             // 1. Try legacy Input
-            try
+            if (_legacyInputAvailable)
             {
-                if (Input.GetKeyDown(legacyKey)) return true;
+                try
+                {
+                    if (Input.GetKeyDown(legacyKey)) return true;
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    _legacyInputAvailable = false;
+                    Debug.LogWarning($"[Inventory Master] DIAGNOSTIC: Legacy Input.GetKeyDown threw, switching to New Input System fallback permanently. Exception: {ex.Message}");
+                }
             }
-            catch { }
 
             // 2. Try New Input System
+            if (!_loggedFallbackSwitch)
+            {
+                _loggedFallbackSwitch = true;
+                Debug.Log("[Inventory Master] DIAGNOSTIC: Now using New Input System fallback path for key checks.");
+            }
             try
             {
                 var kb = Keyboard.current;
+                if (kb == null && !_loggedNullKeyboard)
+                {
+                    _loggedNullKeyboard = true;
+                    Debug.LogWarning("[Inventory Master] DIAGNOSTIC: Keyboard.current is NULL - New Input System fallback cannot detect any key presses!");
+                }
                 if (kb != null)
                 {
                     switch (legacyKey)
