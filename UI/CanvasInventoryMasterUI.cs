@@ -728,9 +728,9 @@ namespace InventoryMaster.UI
             var labelLe = labelGO.AddComponent<LayoutElement>();
             labelLe.flexibleWidth = 1f;
 
-            var checkContainer = CreateBox(row.transform, "CheckContainer", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(30, 30), CheckboxWoodBg);
+            var checkContainer = CreateBox(row.transform, "CheckContainer", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(58, 30), CheckboxWoodBg);
             var checkLe = checkContainer.AddComponent<LayoutElement>();
-            checkLe.preferredWidth = 30;
+            checkLe.preferredWidth = 58;
             checkLe.preferredHeight = 30;
             checkLe.flexibleWidth = 0f;
 
@@ -738,7 +738,7 @@ namespace InventoryMaster.UI
             checkOutline.effectColor = new Color(0.92f, 0.74f, 0.38f, 0.85f);
             checkOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
-            var checkTxt = CreateText(checkContainer.transform, "Checkmark", initialValue ? "✔" : "", 18, FontStyle.Bold, CheckmarkGold, TextAnchor.MiddleCenter);
+            var checkTxt = CreateText(checkContainer.transform, "Checkmark", initialValue ? "ON" : "OFF", 13, FontStyle.Bold, initialValue ? CheckmarkGold : Color.gray, TextAnchor.MiddleCenter);
 
             bool state = initialValue;
             var btn = checkContainer.AddComponent<Button>();
@@ -747,7 +747,8 @@ namespace InventoryMaster.UI
             void Toggle()
             {
                 state = !state;
-                checkTxt.text = state ? "✔" : "";
+                checkTxt.text = state ? "ON" : "OFF";
+                checkTxt.color = state ? CheckmarkGold : Color.gray;
                 onToggle?.Invoke(state);
             }
 
