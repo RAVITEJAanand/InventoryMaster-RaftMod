@@ -573,6 +573,24 @@ namespace InventoryMaster.UI
             infoText.lineSpacing = 1.30f;
             EnsureLayout(infoText.gameObject, -1, 80);
 
+            CreateSectionBanner(page.transform, "🔄 MOD VERSION & UPDATES");
+
+            var verRow = CreateBox(page.transform, "VerRow", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(0, 40), WoodTitleBar);
+            EnsureLayout(verRow, -1, 40);
+            var verLayout = verRow.AddComponent<HorizontalLayoutGroup>();
+            verLayout.padding = new RectOffset(16, 16, 3, 3);
+            verLayout.spacing = 12;
+            verLayout.childForceExpandHeight = true;
+
+            CreateText(verRow.transform, "VerLabel", $"🎒 Inventory Master <b>v{PluginInfo.PLUGIN_VERSION}</b>", 14, FontStyle.Normal, TextParchmentLight, TextAnchor.MiddleLeft);
+
+            CreateButton(verRow.transform, "Btn_CheckUpdates", "🔄 Check for Updates", Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(180, 34), () =>
+            {
+                UpdateChecker.Dismissed = false;
+                UpdateChecker.Instance?.TriggerCheck();
+                ToastManager.Show("Checking GitHub for mod updates...");
+            }, ActionTileBg, TextParchmentLight, 14);
+
             return page;
         }
         #endregion

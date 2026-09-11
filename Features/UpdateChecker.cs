@@ -132,6 +132,7 @@ namespace InventoryMaster.Features
                     else
                     {
                         IsUpdateAvailable = false;
+                        ToastManager.Show($"✅ Inventory Master is up to date (v{PluginInfo.PLUGIN_VERSION})!");
                         Debug.Log($"[Inventory Master] Up to date (v{PluginInfo.PLUGIN_VERSION}).");
                     }
                 }

@@ -2,7 +2,7 @@
   "modid": "InventoryMaster",
   "name": "Inventory Master",
   "author": "KONDURI (RAVITEJAanand)",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Ultimate Quality-of-Life inventory management mod for Raft: Quick Stack, Craft from Nearby Chests, Auto Sort by Categories, Balanced Stack Sizes, Hotbar Swap, Drop Protection, Auto Pickup, Smart Split, Auto Tool Equip, Fast Bulk Transfer, One-Click Storage Dump, Favorite Items Lock, Trash Slot with Undo, and Auto Refill.",
   "targetVersion": "1.09",
   "gameVersion": "1.09 / Update 13.01",
