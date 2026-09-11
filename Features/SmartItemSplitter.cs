@@ -35,7 +35,10 @@ namespace InventoryMaster.Features
             Slot emptySlot = null;
             foreach (var s in inv.allSlots)
             {
-                if (s != null && s.IsEmpty)
+                // s.active gates out backpack placeholder slots beyond the equipped backpack's
+                // tier (the game itself requires this - see Inventory.FindSuitableSlot). Without
+                // it, a split silently lands in a hidden slot and looks like the item vanished.
+                if (s != null && s.active && s.IsEmpty)
                 {
                     emptySlot = s;
                     break;

@@ -36,6 +36,12 @@ namespace InventoryMaster.Features
 
                 if (hotSlot == null || backSlot == null) continue;
 
+                // Backpack slots beyond what the player's currently equipped backpack tier
+                // unlocks stay in the list but inactive/hidden (game defaults ALL backpack
+                // slots inactive until a backpack is equipped - see PlayerInventory.InitializeSlots).
+                // Swapping into one silently vanishes the hotbar item into an invisible slot.
+                if (!backSlot.active) continue;
+
                 // Never move locked/favorited items out of their slot.
                 if (FavoriteLockManager.IsLocked(hotSlot) || FavoriteLockManager.IsLocked(backSlot)) continue;
 

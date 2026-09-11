@@ -9,7 +9,7 @@ namespace InventoryMaster
     {
         public const string PLUGIN_GUID = "com.antigravity.inventorymaster";
         public const string PLUGIN_NAME = "Inventory Master";
-        public const string PLUGIN_VERSION = "1.0.5";
+        public const string PLUGIN_VERSION = "1.0.6";
     }
     // ============================================================================
     // [END] MOD METADATA & CONSTANTS
