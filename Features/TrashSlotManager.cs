@@ -63,7 +63,21 @@ namespace InventoryMaster.Features
             var inv = PlayerHelper.GetPlayerInventory();
             if (inv == null) return;
 
-            int remaining = inv.AddItem(_lastTrashed.BaseItem.UniqueName, _lastTrashed.Amount);
+            // If the backpack is full, native AddItem() auto-drops the overflow on the ground
+            // via PlayerInventory.DropItem(Item_Base,int) instead of losing it. Suppress our own
+            // Drop Protection patch for that call so a protected item (tool/weapon/armor) doesn't
+            // get silently cancelled mid-restore and disappear entirely.
+            int remaining;
+            DropProtectionManager.SuppressForInternalTransfer = true;
+            try
+            {
+                remaining = inv.AddItem(_lastTrashed.BaseItem.UniqueName, _lastTrashed.Amount);
+            }
+            finally
+            {
+                DropProtectionManager.SuppressForInternalTransfer = false;
+            }
+
             if (remaining > 0)
             {
                 ToastManager.Show($"⚠️ Inventory full! Could only recover {_lastTrashed.Amount - remaining} items.");

@@ -54,8 +54,9 @@ namespace InventoryMaster.Features
                     var suitableSlot = player.Inventory.FindSuitableSlot(baseItem);
                     if (suitableSlot == null && !HasEmptySlot(player.Inventory))
                     {
-                        // Inventory full
-                        break;
+                        // No room for this particular item; other nearby items may still
+                        // stack into their own existing partial stacks, so keep checking.
+                        continue;
                     }
                 }
 

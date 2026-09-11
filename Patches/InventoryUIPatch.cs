@@ -18,9 +18,18 @@ namespace InventoryMaster.Patches
     [HarmonyPatch(typeof(Inventory), "Update")]
     public static class Patch_Inventory_Update
     {
+        // Inventory.Update() is a per-instance MonoBehaviour method: every active chest/backpack
+        // Inventory component in the scene runs it every frame, so this Postfix would otherwise
+        // fire multiple times for a single key press (e.g. once for the player inventory and once
+        // for an open chest), running the hotkey action several times in the same frame. Guard so
+        // the hotkey logic below executes at most once per rendered frame.
+        private static int _lastProcessedFrame = -1;
+
         static void Postfix(Inventory __instance)
         {
             if (__instance == null || !PlayerHelper.IsInGameWorld()) return;
+            if (Time.frameCount == _lastProcessedFrame) return;
+            _lastProcessedFrame = Time.frameCount;
 
             // 1. Delete key over hovered slot -> Send to Trash Slot (Feature 14)
             if (InputHelper.WasKeyPressed(KeyCode.Delete))

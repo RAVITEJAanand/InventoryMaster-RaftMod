@@ -11,8 +11,20 @@ namespace InventoryMaster.Features
     // ============================================================================
     public static class DropProtectionManager
     {
+        // When the player's own inventory is full, Raft's native Inventory.AddItem() silently
+        // falls back to PlayerInventory.DropItem(Item_Base,int) to place the overflow on the
+        // ground instead of losing it. That exact method is the one this class patches. If a mod
+        // feature (Undo Trash, Fast Transfer) relies on that native overflow-to-ground fallback
+        // and this manager blocks the drop for a protected category, the item vanishes entirely:
+        // it never made it into the inventory (no suitable slot) and the drop got cancelled. Mod
+        // features that depend on that fallback must set this flag around the call so the safety
+        // net still works, without weakening protection against the player's own manual Q drops.
+        public static bool SuppressForInternalTransfer = false;
+
         public static bool ShouldBlockDrop(Slot slot)
         {
+            if (SuppressForInternalTransfer) return false;
+
             if (Plugin.EnableDropProtection == null || !Plugin.EnableDropProtection.Value)
             {
                 return false;
@@ -49,6 +61,7 @@ namespace InventoryMaster.Features
 
         public static bool ShouldBlockDrop(Item_Base item)
         {
+            if (SuppressForInternalTransfer) return false;
             if (Plugin.EnableDropProtection == null || !Plugin.EnableDropProtection.Value) return false;
             if (InputHelper.IsShiftHeld()) return false;
 

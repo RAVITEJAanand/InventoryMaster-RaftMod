@@ -19,6 +19,7 @@ namespace InventoryMaster.Features
             if (Plugin.EnableSmartSplit == null || !Plugin.EnableSmartSplit.Value) return false;
             if (slot == null || slot.IsEmpty || !slot.HasValidItemInstance()) return false;
             if (slot.itemInstance.Amount <= 1) return false;
+            if (FavoriteLockManager.IsLocked(slot)) return false; // Never split a locked stack into an unlocked slot!
 
             // Only trigger on Right Click with Shift or Ctrl held
             if (eventData.button != PointerEventData.InputButton.Right) return false;

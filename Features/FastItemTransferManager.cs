@@ -45,7 +45,22 @@ namespace InventoryMaster.Features
                 if (s.itemInstance.baseItem.UniqueIndex != baseItem.UniqueIndex) continue;
 
                 int amount = s.itemInstance.Amount;
-                int remaining = targetInv.AddItem(baseItem.UniqueName, amount);
+
+                // If the target is the player's own inventory and it's full, native AddItem()
+                // auto-drops the overflow on the ground instead of losing it. Suppress Drop
+                // Protection for that internal call so a protected item isn't silently cancelled
+                // mid-transfer and lost (it would already be deducted from the source slot below).
+                bool targetIsPlayerInv = targetInv == playerInv;
+                int remaining;
+                if (targetIsPlayerInv) DropProtectionManager.SuppressForInternalTransfer = true;
+                try
+                {
+                    remaining = targetInv.AddItem(baseItem.UniqueName, amount);
+                }
+                finally
+                {
+                    if (targetIsPlayerInv) DropProtectionManager.SuppressForInternalTransfer = false;
+                }
                 int transferred = amount - remaining;
 
                 if (transferred > 0)

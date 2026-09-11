@@ -36,6 +36,9 @@ namespace InventoryMaster.Features
 
                 if (hotSlot == null || backSlot == null) continue;
 
+                // Never move locked/favorited items out of their slot.
+                if (FavoriteLockManager.IsLocked(hotSlot) || FavoriteLockManager.IsLocked(backSlot)) continue;
+
                 // Temporary copy of hotSlot item
                 var hotItem = hotSlot.itemInstance;
                 var backItem = backSlot.itemInstance;

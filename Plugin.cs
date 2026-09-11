@@ -145,9 +145,22 @@ namespace InventoryMaster
             }
         }
 
+        private static bool _wasInGameWorld = false;
+
         private void Update()
         {
-            if (!PlayerHelper.IsInGameWorld()) return;
+            bool inGameWorld = PlayerHelper.IsInGameWorld();
+            if (_wasInGameWorld && !inGameWorld)
+            {
+                // Leaving the world: the old Slot GameObjects (and their instance IDs) are gone,
+                // so drop the stale static lock/badge caches instead of letting them accumulate
+                // across repeated world loads.
+                FavoriteLockManager.ClearAll();
+                SlotLockOverlay.ClearCache();
+            }
+            _wasInGameWorld = inGameWorld;
+
+            if (!inGameWorld) return;
 
             // Global Hotbar Swap Hotkey (V)
             if (KeyHotbarSwap != null && InputHelper.WasKeyPressed(KeyHotbarSwap.Value))

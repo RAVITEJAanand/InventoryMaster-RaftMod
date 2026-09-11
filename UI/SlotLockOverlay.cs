@@ -18,6 +18,16 @@ namespace InventoryMaster.UI
         private static readonly Dictionary<int, GameObject> _cachedBadges = new Dictionary<int, GameObject>();
         private static Font _cachedFont = null;
 
+        /// <summary>
+        /// Clears cached badge references. Slot GameObjects (and their badge children) are
+        /// destroyed when a world is unloaded; without this the dictionary would otherwise
+        /// accumulate stale entries for destroyed slots forever across repeated world loads.
+        /// </summary>
+        public static void ClearCache()
+        {
+            _cachedBadges.Clear();
+        }
+
         public static void UpdateSlotVisual(Slot slot)
         {
             if (slot == null || slot.gameObject == null) return;
