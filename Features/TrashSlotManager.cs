@@ -63,24 +63,36 @@ namespace InventoryMaster.Features
             var inv = PlayerHelper.GetPlayerInventory();
             if (inv == null) return;
 
+            // Rebuild the exact ItemInstance (including durability) that was trashed. The
+            // string+amount overload of AddItem always creates a fresh instance at max Uses,
+            // which would silently restore a broken/worn tool at full durability - use the
+            // ItemInstance overload instead so Uses is preserved exactly as it was trashed.
+            var restoreInstance = new ItemInstance(_lastTrashed.BaseItem, _lastTrashed.Amount, _lastTrashed.Uses);
+
             // If the backpack is full, native AddItem() auto-drops the overflow on the ground
-            // via PlayerInventory.DropItem(Item_Base,int) instead of losing it. Suppress our own
-            // Drop Protection patch for that call so a protected item (tool/weapon/armor) doesn't
-            // get silently cancelled mid-restore and disappear entirely.
-            int remaining;
+            // instead of losing it. Suppress our own Drop Protection patch for that call so a
+            // protected item (tool/weapon/armor) doesn't get silently cancelled mid-restore and
+            // disappear entirely.
             DropProtectionManager.SuppressForInternalTransfer = true;
             try
             {
-                remaining = inv.AddItem(_lastTrashed.BaseItem.UniqueName, _lastTrashed.Amount);
+                inv.AddItem(restoreInstance, true);
             }
             finally
             {
                 DropProtectionManager.SuppressForInternalTransfer = false;
             }
 
-            if (remaining > 0)
+            // AddItem mutates restoreInstance in place: Amount/Uses are left at whatever
+            // portion could not be placed (0 if everything was restored).
+            if (restoreInstance.Amount > 0)
             {
-                ToastManager.Show($"⚠️ Inventory full! Could only recover {_lastTrashed.Amount - remaining} items.");
+                int recovered = _lastTrashed.Amount - restoreInstance.Amount;
+                ToastManager.Show($"⚠️ Inventory full! Could only recover {recovered} items.");
+                // Keep only the still-outstanding remainder so a second Undo press can't
+                // re-add the portion that was already restored above (which would duplicate it).
+                _lastTrashed.Amount = restoreInstance.Amount;
+                _lastTrashed.Uses = restoreInstance.Uses;
             }
             else
             {

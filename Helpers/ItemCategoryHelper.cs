@@ -52,8 +52,12 @@ namespace InventoryMaster.Helpers
             }
 
             // 3. Drinks & Hydration
-            if (name.Contains("water") || name.Contains("drinking") || name.Contains("cup") ||
-                name.Contains("bottle") || name.Contains("smoothie"))
+            // NOTE: "watermelon" (and its "Seed_Watermelon") legitimately contains "water" as a
+            // substring but is a raw food/crop, not a drink - exclude it explicitly so it falls
+            // through to the Raw Food / Seeds checks below instead of being misplaced here.
+            if (!name.Contains("watermelon") &&
+                (name.Contains("water") || name.Contains("drinking") || name.Contains("cup") ||
+                 name.Contains("bottle") || name.Contains("smoothie")))
             {
                 return ItemCategory.PotableDrink;
             }

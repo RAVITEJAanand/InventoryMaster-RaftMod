@@ -1,7 +1,7 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "Inventory Master",
   "downloadUrl": "https://github.com/RAVITEJAanand/InventoryMaster-RaftMod/releases",
   "raftModdingUrl": "https://raftmodding.com/",
-  "notes": "v1.0.1: Fixed Trash hotkey silently undoing itself when a chest is open, fixed protected items vanishing when Drop Protection blocked the game's own inventory-full auto-drop, fixed Favorite/Lock being bypassed by Hotbar Swap and Smart Split, fixed Auto Pickup stopping early when one item didn't fit, and fixed a stale slot-lock cache leaking across world loads."
+  "notes": "v1.0.2: Fixed Auto Sort miscategorizing Watermelon as a drink, fixed Auto Refill missing PlasticCup_Water/Canteen_Water and incorrectly eating CoconutChicken as if it were water, and fixed Trash Undo losing item durability and being able to duplicate items on a partial restore."
 }

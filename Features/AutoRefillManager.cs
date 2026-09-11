@@ -74,12 +74,19 @@ namespace InventoryMaster.Features
                 string name = baseItem.UniqueName;
                 if (string.IsNullOrEmpty(name)) continue;
 
-                // Check for fresh water / drinks; strictly avoid saltwater
-                if ((name.IndexOf("water_fresh", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     name.IndexOf("bottle_water", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     name.IndexOf("coconut", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     name.IndexOf("smoothie", StringComparison.OrdinalIgnoreCase) >= 0) &&
-                    name.IndexOf("salt", StringComparison.OrdinalIgnoreCase) < 0)
+                // Check for fresh water / drinks; strictly avoid saltwater.
+                // Real fresh-water container items are PlasticBottle_Water, PlasticCup_Water and
+                // Canteen_Water (their salt variants end in "_SaltWater"), so match on the
+                // "_water" suffix rather than a bare "water" substring - the old check only
+                // matched PlasticBottle_Water by accident (via "bottle_water") and silently
+                // ignored PlasticCup_Water/Canteen_Water. Also exclude "coconutchicken", a cooked
+                // meat dish, so it isn't grabbed as a drink just because it contains "coconut".
+                bool isFreshWaterContainer = name.EndsWith("_water", StringComparison.OrdinalIgnoreCase) &&
+                                              name.IndexOf("salt", StringComparison.OrdinalIgnoreCase) < 0;
+                bool isCoconutDrink = name.IndexOf("coconut", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                                       name.IndexOf("chicken", StringComparison.OrdinalIgnoreCase) < 0;
+                if (isFreshWaterContainer || isCoconutDrink ||
+                    name.IndexOf("smoothie", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     player.Stats.Consume(baseItem);
                     slot.RemoveItem(1);
